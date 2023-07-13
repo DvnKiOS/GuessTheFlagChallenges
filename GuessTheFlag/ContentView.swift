@@ -10,11 +10,13 @@ import SwiftUI
 struct ContentView: View {
     @State private var showingScore = false
     @State private var isWrongAnswerAlertShowing = false
+    @State private var isGameOverAlertShowing = false
     @State private var scoreTitle = ""
     @State private var userScore = 0
     @State private var countries = ["Estonia", "France" , "Germany", "Ireland", "Italy", "Nigeria", "Poland", "Russia", "Spain", "UK", "US"].shuffled()
     @State private var correctAnswer = Int.random(in: 0...2)
-    @State private var tappedFlagIndex = 0 
+    @State private var tappedFlagIndex = 0
+    @State private var gameDuration = 8
     
     var body: some View {
         ZStack {
@@ -52,7 +54,10 @@ struct ContentView: View {
                     
                     ForEach(0..<3) { number in
                         Button {
+                            
+                            print("\(gameDuration)")
                             flagTapped(number)
+                           
                         } label: {
                             Image(countries[number])
                                 .renderingMode(.original)
@@ -73,6 +78,14 @@ struct ContentView: View {
             } message: {
                 Text("You picked the flag for \(countries[tappedFlagIndex])")
             }
+            .alert(scoreTitle, isPresented: $isGameOverAlertShowing) {
+                Button("Reset Game", action: reset)
+                
+            } message: {
+                Text("Great Work!")
+            }
+        
+            
         }
     }
     
@@ -91,7 +104,27 @@ struct ContentView: View {
     func askQuestion() {
         countries.shuffle()
         correctAnswer = Int.random(in: 0...2)
+        gameDuration -= 1
+        reset()
     }
+    func reset() {
+        if gameDuration == 0 {
+            userScore = 0
+            countries.shuffle()
+            correctAnswer = Int.random(in: 0...2)
+            scoreTitle = "Game over, Resetting game..."
+            isGameOverAlertShowing = true
+            gameDuration = 8
+            
+            
+            
+            
+        }
+    
+        
+    }
+        
+
 }
 
 struct ContentView_Previews: PreviewProvider {
